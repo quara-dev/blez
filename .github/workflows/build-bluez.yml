@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.ref }}.${{ matrix.platform }}
-      cancel-in-progress: true
+      cancel-in-progress: false
     strategy:
       matrix:
         platform:
@@ -41,5 +41,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: bluez-${{ matrix.version }}-${{ matrix.platform }}
+          name: bluez
           path: dist/*.tar.gz

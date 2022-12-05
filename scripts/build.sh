@@ -4,6 +4,29 @@ set -euo pipefail
 
 OUTPUT_DIR="${OUTPUT_DIR:-/opt/bluez}"
 
+
+#
+# Find host platform
+#
+function platform {
+    case $(arch) in
+        x86_64)
+            echo "linux-amd64"
+            ;;
+        aarch64)
+            echo "linux-arm64"
+            ;;
+        armv7l)
+            echo "linux-arm-v7"
+            ;;
+        *)
+            >&2 echo "Architecture not supported: $(arch)"
+            exit 1
+            ;;
+    esac
+}
+
+
 # Install system dependencies required to build Bluez project
 function installDependencies {
     apt-get update
@@ -73,7 +96,7 @@ function archive {
     VERSION="$1"
     mkdir -p $OUTPUT_DIR
     tar -czf "$OUTPUT_DIR/bluez-$VERSION.tar.gz" "/opt/bluez-$VERSION"
-    echo -e "Created archive in $OUTPUT_DIR/bluez-$VERSION.tar.gz"
+    echo -e "Created archive in $OUTPUT_DIR/bluez-$VERSION-$(platform).tar.gz"
 }
 
 # Build a single version distribution
