@@ -1,9 +1,6 @@
 name: build-bluez
 
-on:
-  push:
-    tags:
-      - "*"
+on: workflow_dispatch
 
 jobs:
   build-all:

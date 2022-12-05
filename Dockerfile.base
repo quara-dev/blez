@@ -27,6 +27,5 @@ RUN curl -O -q "https://bootstrap.pypa.io/get-pip.py" \
 RUN mkdir -p \
         /etc/bluetooth \
         /etc/dbus-1/system.d \
-        /opt/bluetooth \
         /etc/supervisor \
         /etc/supervisor.d

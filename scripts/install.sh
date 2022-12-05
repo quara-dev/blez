@@ -55,6 +55,7 @@ function install {
     if [ ! -f "/etc/profile.d/bluetooth.sh" ]; then
         cp $PARENT_DIR/profile.d/bluetooth.sh /etc/profile.d/bluetooth.sh
         sed -i "s@__MARKER__@$BLUEZ_HOME@" /etc/profile.d/bluetooth.sh
+        sed -i "s@__MARKER__@$BLUEZ_HOME@" /etc/profile.d/bluetooth.sh
     fi
 }
 

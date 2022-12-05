@@ -1,7 +1,9 @@
 name: build-blez-image
 
 on:
-  - push
+  push:
+    tags:
+      - "*"
 
 jobs:
   build:
