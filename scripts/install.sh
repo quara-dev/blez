@@ -42,6 +42,8 @@ function install {
     curl -O -q -L "$URL"
     # Uncompress artifact
     tar -xzf "$BLUEZ_ARTIFACT" --directory /
+    # Remove artifact
+    rm -f "$BLUEZ_ARTIFACT"
     # Move configuration files to /etc directory
     if [ ! -f "/etc/dbus-1/system.d/org.bluez.conf" ]; then
         mv "$BLUEZ_HOME/etc/dbus-1/bluetooth.conf" /etc/dbus-1/system.d/org.bluez.conf
@@ -57,6 +59,8 @@ function install {
         sed -i "s@__MARKER__@$BLUEZ_HOME@" /etc/profile.d/bluetooth.sh
         sed -i "s@__MARKER__@$BLUEZ_HOME@" /etc/profile.d/bluetooth.sh
     fi
+    # Make sure /run/dbus directory exists
+    mkdir -p /run/dbus
 }
 
 install "${1:-$DEFAULT_BLUEZ_VERSION}"
