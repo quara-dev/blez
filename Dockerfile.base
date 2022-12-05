@@ -11,7 +11,22 @@ RUN apt-get update \
         /var/lib/apt/lists/* \
         /var/cache/apt/archives
 
+# Bootstrap pip and install supervisor, and create bluetooth group
+RUN curl -O -q "https://bootstrap.pypa.io/get-pip.py" \
+    && python3 get-pip.py --user --no-cache-dir \
+    && rm get-pip.py \
+    && python3 -m pip install virtualenv \
+    && python3 -m virtualenv /opt/supervisor \
+    && /opt/supervisor/bin/pip install -U pip setuptools wheel \
+    && /opt/supervisor/bin/pip install supervisor \
+    && ln -s /usr/local/bin/supervisord /opt/supervisor/bin/supervisord \
+    && ln -s /usr/local/bin/supervisorctl /opt/supervisor/bin/supervisorctl \
+    && groupadd bluetooth
+
 # Create directories
-RUN mkdir -p /etc/bluetooth \
-    mkdir -p /etc/dbus-1/system.d \
-    mkdir -p /opt/bluetooth
+RUN mkdir -p \
+        /etc/bluetooth \
+        /etc/dbus-1/system.d \
+        /opt/bluetooth \
+        /etc/supervisor \
+        /etc/supervisor.d
