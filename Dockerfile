@@ -11,6 +11,7 @@ ENV DBUS_HOME="/etc/dbus-1"
 RUN /opt/blez-scripts/install.sh "$BLUEZ_VERSION"
 
 # Copy default configurations
+COPY configs/bluetooth/main.conf /etc/bluetooth/main.conf
 COPY configs/dbus-1/org.bluez.conf /etc/dbus-1/system.d/org.bluez.conf
 COPY configs/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
 
