@@ -80,7 +80,7 @@ function build {
     # Make sure previous build is deleted
     rm -rf "/opt/bluez-$VERSION"
     # Build
-    make -j8
+    make -j4
     # Install in prefix
     make install
     mkdir -p "/opt/bluez-$VERSION/etc/dbus-1"
