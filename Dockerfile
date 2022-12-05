@@ -4,6 +4,7 @@ COPY scripts /opt/blez-scripts
 
 ARG BLUEZ_VERSION="5.66"
 ENV BLUEZ_VERSION="$BLUEZ_VERSION"
+ENV BLUEZ_HOME="/opt/bluez-$BLUEZ_VERSION"
 ENV SUPERVISOR_HOME="/etc/supervisor"
 ENV DBUS_HOME="/etc/dbus-1"
 
