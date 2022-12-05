@@ -1,6 +1,8 @@
-name: build-manylinux-2_24
+name: build-bluez
+
 on:
   - push
+
 jobs:
   build_docker:
     runs-on: ubuntu-latest
