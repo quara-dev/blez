@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+OUTPUT_DIR="${OUTPUT_DIR:/opt/bluez}"
+
 # Install system dependencies required to build Bluez project
 function installDependencies {
     apt-get update
@@ -18,8 +20,7 @@ function installDependencies {
         libudev-dev \
         make \
         udev
-    mkdir -p /opt/bluez
-}
+    mkdir -p $OUTPUT_DIR
 
 # Clone Bluez git repository from github on latest tag
 function cloneRepository {
@@ -71,8 +72,8 @@ function build {
 function archive {
     VERSION="$1"
     mkdir -p /opt/bluez
-    tar -czf "/opt/bluez/bluez-$VERSION.tar.gz" "/opt/bluez-$VERSION"
-    echo -e "Created archive in /opt/bluez/bluez-$VERSION.tar.gz"
+    tar -czf "$OUTPUT_DIR/bluez-$VERSION.tar.gz" "/opt/bluez-$VERSION"
+    echo -e "Created archive in $OUTPUT_DIR/bluez-$VERSION.tar.gz"
 }
 
 # Build a single version distribution
