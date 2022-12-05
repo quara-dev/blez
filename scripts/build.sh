@@ -21,6 +21,7 @@ function installDependencies {
         make \
         udev
     mkdir -p $OUTPUT_DIR
+}
 
 # Clone Bluez git repository from github on latest tag
 function cloneRepository {
