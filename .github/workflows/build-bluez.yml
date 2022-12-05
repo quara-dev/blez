@@ -6,6 +6,9 @@ on:
 jobs:
   build_docker:
     runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.ref }}.${{ matrix.platform }}
+      cancel-in-progress: true
     strategy:
       matrix:
         platform:
