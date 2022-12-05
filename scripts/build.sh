@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-OUTPUT_DIR="${OUTPUT_DIR:/opt/bluez}"
+OUTPUT_DIR="${OUTPUT_DIR:-/opt/bluez}"
 
 # Install system dependencies required to build Bluez project
 function installDependencies {
