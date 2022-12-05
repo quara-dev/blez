@@ -7,20 +7,10 @@ RUN apt-get update \
         curl \
         dbus \
         libglib2.0-0 \
+        supervisor \
     && rm -rf \
         /var/lib/apt/lists/* \
-        /var/cache/apt/archives
-
-# Bootstrap pip and install supervisor, and create bluetooth group
-RUN curl -O -q "https://bootstrap.pypa.io/get-pip.py" \
-    && python3 get-pip.py --user --no-cache-dir \
-    && rm get-pip.py \
-    && python3 -m pip install virtualenv \
-    && python3 -m virtualenv /opt/supervisor \
-    && /opt/supervisor/bin/pip install -U pip setuptools wheel \
-    && /opt/supervisor/bin/pip install supervisor \
-    && ln -s /usr/local/bin/supervisord /opt/supervisor/bin/supervisord \
-    && ln -s /usr/local/bin/supervisorctl /opt/supervisor/bin/supervisorctl \
+        /var/cache/apt/archives \
     && groupadd bluetooth
 
 # Create directories
