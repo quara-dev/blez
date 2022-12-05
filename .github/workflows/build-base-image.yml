@@ -21,8 +21,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          file: "{context}/images/Dockerfile.base"
-          context: "{{defaultContext}}/.github"
+          file: Dockerfile.base
           push: true
           tags: quara/blez-base:latest
           platforms: linux/amd64,linux/arm64,linux/arm/v7
