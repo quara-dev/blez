@@ -24,7 +24,7 @@ jobs:
           # - "5.63"
           # - "5.64"
           # - "5.65"
-          # - "5.66"
+          - "5.66"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
