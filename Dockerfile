@@ -13,3 +13,6 @@ RUN /opt/blez-scripts/install.sh "$BLUEZ_VERSION"
 # Copy default configurations
 COPY configs/dbus-1/org.bluez.conf /etc/dbus-1/system.d/org.bluez.conf
 COPY configs/supervisor/supervisord.conf /etc/supervisor/supervisord.conf
+
+# Define default command
+CMD ["supervisord", "--config", "/etc/supervisor/supervisord.conf"]
