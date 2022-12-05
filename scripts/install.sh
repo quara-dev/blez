@@ -33,6 +33,7 @@ function platform {
 #
 function install {
     BLUEZ_VERSION="$1"
+    echo "Bluez version configured to $BLUEZ_VERSION"
     BLUEZ_DIR="bluez-$BLUEZ_VERSION"
     BLUEZ_HOME="/opt/$BLUEZ_DIR"
     BLUEZ_ARTIFACT="$BLUEZ_DIR-$(platform).tar.gz"
@@ -40,11 +41,7 @@ function install {
     # Download build artifact from URL
     curl -O -q -L "$URL"
     # Uncompress artifact
-    tar -xzf "$BLUEZ_ARTIFACT"
-    # Install bluez into /opt directory
-    mv "./opt/$BLUEZ_DIR/" "$BLUEZ_HOME"
-    # Remove empty directory
-    rmdir ./opt
+    tar -xzf "$BLUEZ_ARTIFACT" --directory /
     # Move configuration files to /etc directory
     if [ ! -f "/etc/dbus-1/system.d/org.bluez.conf" ]; then
         mv "$BLUEZ_HOME/etc/dbus-1/bluetooth.conf" /etc/dbus-1/system.d/org.bluez.conf
@@ -61,4 +58,4 @@ function install {
     fi
 }
 
-install "${1:-DEFAULT_BLUEZ_VERSION}"
+install "${1:-$DEFAULT_BLUEZ_VERSION}"
