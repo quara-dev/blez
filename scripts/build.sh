@@ -20,7 +20,6 @@ function installDependencies {
         libudev-dev \
         make \
         udev
-    mkdir -p $OUTPUT_DIR
 }
 
 # Clone Bluez git repository from github on latest tag
@@ -72,6 +71,7 @@ function build {
 # Archive bluez from prefix directory
 function archive {
     VERSION="$1"
+    mkdir -p $OUTPUT_DIR
     tar -czf "$OUTPUT_DIR/bluez-$VERSION.tar.gz" "/opt/bluez-$VERSION"
     echo -e "Created archive in $OUTPUT_DIR/bluez-$VERSION.tar.gz"
 }
