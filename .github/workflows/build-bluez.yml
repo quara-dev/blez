@@ -8,7 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.ref }}.${{ matrix.platform }}
-      cancel-in-progress: false
     strategy:
       matrix:
         platform:
