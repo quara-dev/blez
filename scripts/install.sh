@@ -38,7 +38,7 @@ function install {
     BLUEZ_ARTIFACT="$BLUEZ_DIR-$(platform).tar.gz"
     URL="https://github.com/charbonnierg/blez/releases/download/$BLEZ_VERSION/$BLUEZ_ARTIFACT"
     # Download build artifact from URL
-    curl -O -q "$URL"
+    curl -O -q -L "$URL"
     # Uncompress artifact
     tar -xzf "$BLUEZ_ARTIFACT"
     # Install bluez into /opt directory
