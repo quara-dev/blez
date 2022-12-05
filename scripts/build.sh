@@ -71,7 +71,6 @@ function build {
 # Archive bluez from prefix directory
 function archive {
     VERSION="$1"
-    mkdir -p /opt/bluez
     tar -czf "$OUTPUT_DIR/bluez-$VERSION.tar.gz" "/opt/bluez-$VERSION"
     echo -e "Created archive in $OUTPUT_DIR/bluez-$VERSION.tar.gz"
 }
