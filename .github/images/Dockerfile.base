@@ -1,0 +1,17 @@
+FROM debian:stable-slim
+
+# Install runtime dependencies
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        dbus \
+        libglib2.0-0 \
+    && rm -rf \
+        /var/lib/apt/lists/* \
+        /var/cache/apt/archives
+
+# Create directories
+RUN mkdir -p /etc/bluetooth \
+    mkdir -p /etc/dbus-1/system.d \
+    mkdir -p /opt/bluetooth

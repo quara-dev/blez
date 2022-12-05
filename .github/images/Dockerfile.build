@@ -1,0 +1,19 @@
+FROM debian:oldstable
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        automake \
+        ca-certificates \
+        gcc \
+        git \
+        libdbus-1-dev \
+        libglib2.0-dev \
+        libical-dev \
+        libreadline-dev \
+        libtool \
+        libudev-dev \
+        make \
+        udev \
+    && rm -rf \
+        /var/lib/apt/lists/* \
+        /var/cache/apt/archives
