@@ -16,3 +16,9 @@ PLATFORM="linux/arm64"
 ```
 
 > When using docker, artifacts are located in the `dist/` directory.
+
+## Solidrun Runtime Environments
+
+In order to run Bluetooth stack on Solidrun devices, it is recommended to use the image built from:
+
+> https://github.com/SolidRun/imx6_buildroot

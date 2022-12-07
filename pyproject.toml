@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "blez"
+authors = [
+    { author = "Guillaume Charbonnier", email = "guillaume.charbonnier@araymond.com" },
+]
+description = "Bluetooth Low Energy python client using D-Bus and Bluez"
+readme = "README.md"
+requires-python = ">=3.7"
+keywords = ["bluetooth", "bluez", "dbus", "asyncio"]
+license = { text = "Apache-2.0" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+]
+dynamic = ["version"]
+dependencies = [
+    "dbus-fast",
+    "dbus_next",
+    "typing_extensions; python_version<'3.8'",
+]
+
+[project.optional-dependencies]
+tests = ["pytest", "pytest-cov"]
+dev = ["black", "isort", "flake8", "mypy", "bandit"]
+
+[project.urls]
+Repository = "https://github.com/charbonnierg/blez"
+Issues = "https://github.com/charbonnierg/blez/issues"
+
+[tool.setuptools.dynamic]
+version = { attr = "blez.__version__" }
