@@ -4,7 +4,7 @@ import re
 
 from .entities.bluez.adapter import BluezAdapter
 from .entities.bluez.device import BluezDevice
-from .entities.dbus import client, service
+from .entities.bluez.manager import Manager
 from .interfaces.dbus import Bus, Codec
 
 ADDRESS_PATTERN = re.compile("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")
@@ -26,22 +26,6 @@ def is_address(value: str) -> bool:
     return ADDRESS_PATTERN.match(value) is not None
 
 
-def extract_address_from_path(path: str) -> str:
-    return ":".join(path.split("/")[:5][-1][-17:].split("_"))
-
-
-def extract_adapter_from_path(path: str) -> str:
-    return path.split("/")[:4][-1]
-
-
-def extract_service_handle_from_path(path: str) -> str:
-    return int(path.split("/")[:6][-1][-4:], 16)
-
-
-def extract_char_handle_from_path(path: str) -> str:
-    return int(path.split("/")[:7][-1][-4:], 16)
-
-
 class BlezClient:
     def __init__(
         self,
@@ -52,17 +36,14 @@ class BlezClient:
         self.bus_address = bus_address
         self.bus_backend = bus_backend or default_bus()
         self.codec_backend = codec_backend or default_codec()
-        self.dbus = client.Client(
-            self.bus_backend(self.bus_address), self.codec_backend()
-        )
-        self.bluez = service.Service(self.dbus, name="org.bluez")
+        self.bluez = Manager(self.bus_backend(self.bus_address), name="org.bluez")
 
     async def connect(self) -> None:
-        await self.dbus.connect()
+        await self.bluez.bus.connect()
         await self.bluez.reset_tree()
 
     async def disconnect(self) -> None:
-        await self.dbus.disconnect()
+        await self.bluez.bus.disconnect()
 
     def get_adapter(self, name: str | None) -> BluezAdapter | None:
         """Get a single adapter"""

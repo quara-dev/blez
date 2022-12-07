@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Protocol
 
-from .encoder import Message
+from .encoder import Codec, Message
 
 
 class BusType(Enum):
@@ -15,8 +14,12 @@ class BusType(Enum):
     SYSTEM = 2  #: A persistent bus for the whole machine.
 
 
-class Bus(Protocol):
+class Bus:
     """A bus is used to send and receive messages between D-Bus clients or services."""
+
+    def __init_subclass__(cls, codec: type[Codec]) -> None:
+        super().__init_subclass__()
+        cls.codec = codec()
 
     def __init__(
         self,

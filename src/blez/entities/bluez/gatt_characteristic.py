@@ -90,12 +90,12 @@ class BluezGattCharacteristic(Interface, name=GATT_CHARACTERISTIC_INTERFACE):
             - `org.bluez.Error.InvalidOffset`
             - `org.bluez.Error.NotSupported`
         """
-        # Fetch codec from client
-        codec = self.service.client.codec
         # Build options
         options = {}
         if offset is not None:
-            options[GattCharacteristic1MemberOption.OFFSET] = codec.encode(offset, "n")
+            options[GattCharacteristic1MemberOption.OFFSET] = self.service.codec.encode(
+                offset, "n"
+            )
         # Send message
         reply = await self.call(
             member=GattCharacteristic1Member.READ_VALUE,
@@ -111,19 +111,19 @@ class BluezGattCharacteristic(Interface, name=GATT_CHARACTERISTIC_INTERFACE):
         offset: int | None = None,
         prepare_authorize: bool | None = None,
     ) -> int:
-        # Fetch codec from client
-        codec = self.service.client.codec
         # Convert payload to bytes
         payload = bytes(value)
         # Initialize options
         options = {}
         # Include options
         if offset is not None:
-            options[GattCharacteristic1MemberOption.OFFSET] = codec.encode(offset, "n")
-        if prepare_authorize is not None:
-            options[GattCharacteristic1MemberOption.PREPARE_AUTHORIZE] = codec.encode(
-                prepare_authorize, "b"
+            options[GattCharacteristic1MemberOption.OFFSET] = self.service.codec.encode(
+                offset, "n"
             )
+        if prepare_authorize is not None:
+            options[
+                GattCharacteristic1MemberOption.PREPARE_AUTHORIZE
+            ] = self.service.codec.encode(prepare_authorize, "b")
         # Send message
         await self.call(
             member=GattCharacteristic1Member.WRITE_VALUE,

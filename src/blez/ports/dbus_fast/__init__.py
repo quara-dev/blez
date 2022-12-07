@@ -67,7 +67,7 @@ class DBusFastCodec(Codec):
         )
 
 
-class DBusFastBus(Bus):
+class DBusFastBus(Bus, codec=DBusFastCodec):
     def __init__(
         self,
         bus_address: str | None = None,

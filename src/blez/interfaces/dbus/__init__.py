@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from .bus import Bus, BusType
 from .encoder import (
     Codec,

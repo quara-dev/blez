@@ -4,9 +4,13 @@ from typing import Any, Mapping
 
 from dbus_next import Message, Variant
 from dbus_next.aio.message_bus import MessageBus
+from dbus_next.constants import BusType as DBusNextBusType
+from dbus_next.constants import MessageFlag as DBusNextMessageFlag
+from dbus_next.constants import MessageType as DBusNextMessageType
 
 from blez.interfaces.dbus import (
     Bus,
+    BusType,
     Codec,
     MessageFlag,
     MessageType,
@@ -67,8 +71,8 @@ class DBusNextCodec(Codec):
             path=path,
             interface=interface,
             member=member,
-            message_type=message_type,
-            flags=flags,
+            message_type=DBusNextMessageType(MessageType(message_type).value),
+            flags=DBusNextMessageFlag(MessageFlag(flags).value),
             error_name=error_name,
             reply_serial=reply_serial,
             sender=sender,
@@ -80,13 +84,25 @@ class DBusNextCodec(Codec):
         )
 
 
-class DBusNextBus(Bus):
-    def __init__(self) -> None:
+class DBusNextBus(Bus, codec=DBusNextCodec):
+    def __init__(
+        self,
+        bus_address: str | None = None,
+        bus_type: BusType = BusType.SYSTEM,
+        negociate_unix_fd: bool = True,
+    ) -> None:
+        self.bus_address = bus_address
+        self.bus_type = bus_type
+        self.negociate_unix_fd = negociate_unix_fd
         self._bus: MessageBus | None = None
 
     async def connect(self) -> None:
         if not self._bus:
-            self._bus = MessageBus()
+            self._bus = MessageBus(
+                bus_address=self.bus_address,
+                bus_type=DBusNextBusType(BusType(self.bus_type).value),
+                negotiate_unix_fd=self.negociate_unix_fd,
+            )
             await self._bus.connect()
 
     async def disconnect(self):

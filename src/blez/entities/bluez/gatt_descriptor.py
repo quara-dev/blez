@@ -63,12 +63,12 @@ class BluezGattDescriptor(Interface, name=GATT_DESCRIPTOR_INTERFACE):
             - `org.bluez.Error.NotAuthorized`
             - `org.bluez.Error.NotSupported`
         """
-        # Fetch codec from client
-        codec = self.service.client.codec
         # Build options
         options = {}
         if offset is not None:
-            options[GattDescriptor1MemberOption.OFFSET] = codec.encode("n", offset)
+            options[GattDescriptor1MemberOption.OFFSET] = self.service.codec.encode(
+                "n", offset
+            )
         # Send message
         reply = await self.call(
             member=GattDescriptor1Member.READ_VALUE,
@@ -94,19 +94,19 @@ class BluezGattDescriptor(Interface, name=GATT_DESCRIPTOR_INTERFACE):
             - `org.bluez.Error.NotAuthorized`
             - `org.bluez.Error.NotSupported`
         """
-        # Fetch codec from client
-        codec = self.service.client.codec
         # Convert payload to bytes
         payload = bytes(value)
         # Initialize options
         options = {}
         # Include options
         if offset is not None:
-            options[GattDescriptor1MemberOption.OFFSET] = codec.encode("n", offset)
-        if prepare_authorize is not None:
-            options[GattDescriptor1MemberOption.PREPARE_AUTHORIZE] = codec.encode(
-                "b", prepare_authorize
+            options[GattDescriptor1MemberOption.OFFSET] = self.service.codec.encode(
+                "n", offset
             )
+        if prepare_authorize is not None:
+            options[
+                GattDescriptor1MemberOption.PREPARE_AUTHORIZE
+            ] = self.service.codec.encode("b", prepare_authorize)
         # Send message
         await self.call(
             member=GattDescriptor1Member.WRITE_VALUE,

@@ -193,7 +193,7 @@ class BluezAdapter(Interface, name=ADAPTER_INTERFACE):
         """
         await self.call(member=Adapter1Member.START_DISCOVERY)
 
-    async def stop_disovery(self) -> None:
+    async def stop_discovery(self) -> None:
         """This method will cancel any previous StartDiscovery transaction.
 
         Note that a discovery procedure is shared between all
@@ -246,21 +246,20 @@ class BluezAdapter(Interface, name=ADAPTER_INTERFACE):
             - `org.bluez.Error.NotSupported`
             - `org.bluez.Error.Failed`
         """
-        codec = self.service.client.codec
         v_filters: dict[str, Any] = {}
         # Always set "Transport" to "le"
-        v_filters["Transport"] = codec.encode("le", "s")
+        v_filters["Transport"] = self.service.codec.encode("le", "s")
         for key, value in filters.items():
             if key == "UUIDs":
-                v_filters[key] = codec.encode(value, "as")
+                v_filters[key] = self.service.codec.encode(value, "as")
             elif key == "RSSI":
-                v_filters[key] = codec.encode(value, "n")
+                v_filters[key] = self.service.codec.encode(value, "n")
             elif key == "DuplicateData":
-                v_filters[key] = codec.encode(value, "b")
+                v_filters[key] = self.service.codec.encode(value, "b")
             elif key == "Pathloss":
-                v_filters[key] = codec.encode(value, "n")
+                v_filters[key] = self.service.codec.encode(value, "n")
             elif key == "Transport":
-                v_filters[key] = codec.encode(value, "s")
+                v_filters[key] = self.service.codec.encode(value, "s")
             else:
                 # logger.warning("Filter '%s' is not currently supported." % key)
                 continue
@@ -301,14 +300,13 @@ class BluezAdapter(Interface, name=ADAPTER_INTERFACE):
         If connection was successful this method returns object path to
         created device object.
         """
-        codec = self.service.client.codec
         await self.call(
             member=Adapter1Member.CONNECT_DEVICE,
             signature="a{sv}",
             body=[
                 {
-                    "Address": codec.encode(address, "s"),
-                    "AddressType": codec.encode(address_type, "s"),
+                    "Address": self.service.codec.encode(address, "s"),
+                    "AddressType": self.service.codec.encode(address_type, "s"),
                 }
             ],
         )

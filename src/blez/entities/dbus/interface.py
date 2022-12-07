@@ -3,9 +3,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
+    from blez.entities.bluez.manager import Manager
     from blez.interfaces.dbus import Message
-
-    from .service import Service
 
 
 class Interface:
@@ -13,7 +12,7 @@ class Interface:
         """Create a new interface class."""
         cls.DBUS_INTERFACE = name
 
-    def __init__(self, object_path: str, service: Service) -> None:
+    def __init__(self, object_path: str, service: Manager) -> None:
         """Create a new interface."""
         self.path = object_path
         self.service = service

@@ -6,6 +6,8 @@ from typing import Any, Callable
 
 from blez.interfaces.dbus import Codec, Message
 
+from ..dbus.tree import Tree
+
 DEFAULT_CLOCK = time.time
 
 
@@ -14,22 +16,45 @@ class BluezMessage:
     timestamp: int
     path: str
 
-    @classmethod
-    def parse(
-        cls,
+
+@dataclass
+class PropertiesChanged(BluezMessage):
+    interface: str
+    changed_props: dict[str, Any]
+    invalidated_props: list[str]
+
+
+@dataclass
+class InterfacesRemoved(BluezMessage):
+    removed_interfaces: list[str]
+
+
+@dataclass
+class InterfacesAdded(BluezMessage):
+    added_interfaces: dict[str, dict[str, Any]]
+
+
+class MessageHandler:
+    def __init__(
+        self, tree: Tree, codec: Codec, clock: Callable[[], float] = DEFAULT_CLOCK
+    ) -> None:
+        self.tree = tree
+        self.codec = codec
+        self.clock = clock
+
+    def parse_message(
+        self,
         message: Message,
-        codec: Codec,
         timestamp: int | None = None,
-        clock: Callable[[], float] = DEFAULT_CLOCK,
     ) -> PropertiesChanged | InterfacesAdded | InterfacesRemoved | None:
         # Get timestamp
-        received_timestamp = timestamp or clock()
+        received_timestamp = timestamp or self.clock()
         # Get message member
         MEMBER = message.member
         # Process message according to Member field
         if MEMBER == "InterfacesAdded":
             object_path, packed_added_interfaces = message.body
-            added_interfaces = codec.unpack(packed_added_interfaces)
+            added_interfaces = self.codec.unpack(packed_added_interfaces)
             return InterfacesAdded(received_timestamp, object_path, added_interfaces)
         if MEMBER == "InterfacesRemoved":
             object_path, removed_interfaces = message.body
@@ -42,7 +67,7 @@ class BluezMessage:
                 packed_changed_properties,
                 invalidated_properties,
             ) = message.body
-            changed_properties = codec.unpack(packed_changed_properties)
+            changed_properties = self.codec.unpack(packed_changed_properties)
             return PropertiesChanged(
                 received_timestamp,
                 message.path,
@@ -51,58 +76,26 @@ class BluezMessage:
                 invalidated_properties,
             )
 
-
-@dataclass
-class PropertiesChanged(BluezMessage):
-    interface: str
-    changed_props: dict[str, Any]
-    invalidated_props: list[str]
-
-    @classmethod
-    def parse(
-        cls,
-        message: Message,
-        codec: Codec,
-        timestamp: int | None = None,
-        clock: Callable[[], float] = DEFAULT_CLOCK,
-    ) -> PropertiesChanged:
-        msg = super().parse(message, codec, timestamp, clock)
-        if not isinstance(msg, cls):
-            raise TypeError(f"Invalid type: {type(msg).__name__}")
-        return msg
-
-
-@dataclass
-class InterfacesRemoved(BluezMessage):
-    removed_interfaces: list[str]
-
-    @classmethod
-    def parse(
-        cls,
-        message: Message,
-        codec: Codec,
-        timestamp: int | None = None,
-        clock: Callable[[], float] = DEFAULT_CLOCK,
-    ) -> InterfacesAdded:
-        msg = super().parse(message, codec, timestamp, clock)
-        if not isinstance(msg, cls):
-            raise TypeError(f"Invalid type: {type(msg).__name__}")
-        return msg
-
-
-@dataclass
-class InterfacesAdded(BluezMessage):
-    added_interfaces: dict[str, dict[str, Any]]
-
-    @classmethod
-    def parse(
-        cls,
-        message: Message,
-        codec: Codec,
-        timestamp: int | None = None,
-        clock: Callable[[], float] = DEFAULT_CLOCK,
-    ) -> InterfacesRemoved:
-        msg = super().parse(message, codec, timestamp, clock)
-        if not isinstance(msg, cls):
-            raise TypeError(f"Invalid type: {type(msg).__name__}")
-        return msg
+    def process_message(self, message: Message) -> None:
+        event = self.parse_message(message)
+        if event is None:
+            return
+        if isinstance(event, PropertiesChanged):
+            self.tree.update_interface(
+                path=event.path,
+                interface=event.interface,
+                changed_props=event.changed_props,
+                invalidated_props=event.invalidated_props,
+            )
+            return
+        if isinstance(event, InterfacesAdded):
+            for interface, props in event.added_interfaces.items():
+                self.tree.set_interface(
+                    object_path=event.path,
+                    interface=interface,
+                    properties=props,
+                )
+                return
+        if isinstance(event, InterfacesRemoved):
+            for interface in event.removed_interfaces:
+                self.tree.remove_interface(event.path, interface)

@@ -1,33 +1,42 @@
 from __future__ import annotations
 
-from logging import getLogger
-from typing import Any
+import time
+from typing import TYPE_CHECKING, Any, Callable
 
-from blez.interfaces.dbus import Bus, Codec, Message, MessageType
+from blez.interfaces.dbus import MessageType
 
-from .errors import BluezDBusError
+from ..dbus.errors import BluezDBusError
+from ..dbus.tree import Tree
+from .messages import MessageHandler
 
-logger = getLogger(__name__)
+if TYPE_CHECKING:
+    from blez.interfaces.dbus import Bus, Message
 
 
-class Client:
+DEFAULT_CLOCK = time.time
+
+
+class Manager:
     def __init__(
         self,
         bus: Bus,
-        codec: Codec,
+        name: str,
+        tree: Tree | None = None,
+        clock: Callable[[], float] = DEFAULT_CLOCK,
     ) -> None:
         self.bus = bus
-        self.codec = codec
+        self.codec = self.bus.codec
+        self.clock = clock
+        self.name = name
+        self.tree = tree or Tree()
+        self.handler = MessageHandler(self.tree, self.codec, self.clock)
 
-    async def connect(self) -> None:
-        await self.bus.connect()
-
-    async def disconnect(self) -> None:
-        await self.bus.disconnect()
+    async def reset_tree(self) -> None:
+        self.tree.objects.clear()
+        self.tree.objects.update(await self.get_managed_objects())
 
     async def call(
         self,
-        service: str,
         path: str,
         interface: str,
         member: str,
@@ -36,7 +45,7 @@ class Client:
     ) -> Message:
         reply = await self.bus.call(
             self.codec.message(
-                destination=service,
+                destination=self.name,
                 path=path,
                 interface=interface,
                 member=member,
@@ -49,14 +58,12 @@ class Client:
 
     async def get_property(
         self,
-        service: str,
         path: str,
         interface: str,
         key: str,
     ) -> Any:
         """Get a value from a specific object interface property on the bus"""
         reply = await self.call(
-            service=service,
             path=path,
             interface="org.freedesktop.DBus.Properties",
             member="Get",
@@ -67,13 +74,11 @@ class Client:
 
     async def get_all_properties(
         self,
-        service: str,
         path: str,
         interface: str,
     ) -> dict[str, Any]:
         """Get a value from a specific object interface property on the bus"""
         reply = await self.call(
-            service=service,
             path=path,
             interface="org.freedesktop.DBus.Properties",
             member="GetAll",
@@ -84,7 +89,6 @@ class Client:
 
     async def set_property(
         self,
-        service: str,
         path: str,
         interface: str,
         key: str,
@@ -94,7 +98,6 @@ class Client:
         """Set value for a specific object interface property on the bus"""
         encoded = self.codec.encode(value, signature)
         await self.call(
-            service=service,
             path=path,
             interface="org.freedesktop.DBus.Properties",
             member="Set",
@@ -103,12 +106,11 @@ class Client:
         )
 
     async def get_managed_objects(
-        self, service: str, path: str = "/"
+        self, path: str = "/"
     ) -> dict[str, dict[str, dict[str, Any]]]:
         """Get managed objects for given DBus service."""
         # Send message and await reply
         reply = await self.call(
-            service=service,
             path=path,
             member="GetManagedObjects",
             interface="org.freedesktop.DBus.ObjectManager",
