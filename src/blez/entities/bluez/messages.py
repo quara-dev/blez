@@ -78,7 +78,9 @@ class MessageHandler:
                 invalidated_properties,
             )
 
-    def process_message(self, message: Message) -> None:
+    def process_message(
+        self, message: Message
+    ) -> PropertiesChanged | InterfacesAdded | InterfacesRemoved | None:
         event = self.parse_message(message)
         if event is None:
             return None
@@ -89,7 +91,7 @@ class MessageHandler:
                 changed_props=event.changed_props,
                 invalidated_props=event.invalidated_props,
             )
-            return None
+            return event
         if isinstance(event, InterfacesAdded):
             for interface, props in event.added_interfaces.items():
                 self.tree.set_interface(
@@ -97,8 +99,9 @@ class MessageHandler:
                     interface=interface,
                     properties=props,
                 )
-                return None
+            return event
         if isinstance(event, InterfacesRemoved):
             for interface in event.removed_interfaces:
                 self.tree.remove_interface(event.path, interface)
+            return event
         return None

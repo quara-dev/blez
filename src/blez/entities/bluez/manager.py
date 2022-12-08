@@ -162,7 +162,7 @@ class Manager:
             )
         )
 
-    def get_match_rules(
+    def get_default_match_rules(
         self, path: str
     ) -> tuple[MatchRulesDef, MatchRulesDef, MatchRulesDef]:
         interface_added = MatchRulesDef(
@@ -183,9 +183,9 @@ class Manager:
         return interface_added, interface_removed, properties_changed
 
     async def watch_from_path(self, path: str) -> None:
-        for rules in self.get_match_rules(path):
+        for rules in self.get_default_match_rules(path):
             await self.add_match(rules)
 
     async def unwatch_from_path(self, path: str) -> None:
-        for rules in self.get_match_rules(path):
+        for rules in self.get_default_match_rules(path):
             await self.remove_match(rules)

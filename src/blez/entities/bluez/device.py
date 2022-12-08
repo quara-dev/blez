@@ -3,7 +3,9 @@ from __future__ import annotations
 from datetime import datetime
 from enum import Enum
 
+from ..assigned import StandardCharacteristic
 from ..dbus.interface import Interface
+from .gatt_characteristic import BluezGattCharacteristic
 
 DEVICE_INTERFACE = "org.bluez.Device1"
 BATTERY_INTERFACE = "org.bluez.Battery1"
@@ -447,3 +449,68 @@ class BluezDevice(Interface, name=DEVICE_INTERFACE):
         return await self.service.get_property(
             path=self.path, interface=BATTERY_INTERFACE, key=Battery1Property.PERCENTAGE
         )
+
+    # Wrappers
+    def get_characteristic(
+        self, char_or_uuid: str | BluezGattCharacteristic
+    ) -> BluezGattCharacteristic:
+        """Get a characteristic from device."""
+        if isinstance(char_or_uuid, BluezGattCharacteristic):
+            char_or_uuid = char_or_uuid.uuid
+        elif isinstance(char_or_uuid, StandardCharacteristic):
+            char_or_uuid = char_or_uuid.value
+        for characteristic in self.service.tree.get_all_interfaces(
+            BluezGattCharacteristic.DBUS_INTERFACE, prefix=self.path
+        ).values():
+            if characteristic["uuid"] == char_or_uuid:
+                return characteristic
+        raise KeyError(char_or_uuid)
+
+    async def read(
+        self, characteristic: str | BluezGattCharacteristic, offset: int | None = None
+    ) -> bytearray:
+        """Read a characteristic value."""
+        # Mock battery read
+        if characteristic == StandardCharacteristic.BATTERY_LEVEL:
+            value = await self.read_battery()
+            return bytearray([value])
+        # Get GATT characteristic
+        gatt_char = self.get_characteristic(char_or_uuid=characteristic)
+        # Fetch characteristic and call read method
+        return await gatt_char.read_value(offset=offset)
+
+    async def write(
+        self,
+        characteristic: str | BluezGattCharacteristic,
+        value: bytearray,
+        offset: int | None = None,
+        prepare_authorize: bool | None = None,
+    ) -> int:
+        """Write a characteristic value"""
+        # Get GATT characteristic
+        gatt_char = self.get_characteristic(char_or_uuid=characteristic)
+        return await gatt_char.write_value(
+            value, offset=offset, prepare_authorize=prepare_authorize
+        )
+
+    async def start_notify(
+        self, characteristic: str | BluezGattCharacteristic, always: bool = False
+    ) -> None:
+        # Mock battery noify
+        if characteristic == StandardCharacteristic.BATTERY_LEVEL:
+            return None
+        gatt_char = self.get_characteristic(char_or_uuid=characteristic)
+        # Look into cache if characteristic is already notifying
+        if always or not gatt_char.notifying:
+            return await gatt_char.start_notify()
+
+    async def stop_notify(
+        self, characteristic: str | BluezGattCharacteristic, always: bool = False
+    ) -> None:
+        # Mock battery noify
+        if characteristic == StandardCharacteristic.BATTERY_LEVEL:
+            return None
+        gatt_char = self.get_characteristic(char_or_uuid=characteristic)
+        # Look into cache if characteristic is already notifying
+        if always or gatt_char.notifying:
+            return await gatt_char.stop_notify()

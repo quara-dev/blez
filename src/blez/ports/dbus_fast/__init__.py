@@ -90,7 +90,8 @@ class DBusFastBus(Bus, codec=DBusFastCodec):
 
     async def disconnect(self):
         if self._bus:
-            await self._bus.disconnect()
+            self._bus.disconnect()
+            await self._bus.wait_for_disconnect()
             self._bus = None
 
     async def call(self, msg: Message) -> Message:

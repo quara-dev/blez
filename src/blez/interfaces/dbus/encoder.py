@@ -22,25 +22,6 @@ class MessageType(IntEnum):
     SIGNAL = 4  #: A broadcast signal to subscribed connections
 
 
-class Message(Protocol):
-    """Message protocol"""
-
-    destination: str | None
-    path: str | None
-    interface: str | None
-    member: str | None
-    message_type: int | MessageType
-    flags: int | MessageFlag
-    error_name: str | None
-    reply_serial: int
-    sender: str | None
-    unix_fds: list[int]
-    signature: Any
-    signature_tree: Any
-    body: list[Any]
-    serial: int
-
-
 class SignatureType(Protocol):
     token: str
     children: list[SignatureType]
@@ -61,6 +42,25 @@ class Variant(Protocol):
     signature: str
     type: SignatureType
     value: Any
+
+
+class Message(Protocol):
+    """Message protocol"""
+
+    destination: str | None
+    path: str | None
+    interface: str | None
+    member: str | None
+    message_type: int | MessageType
+    flags: int | MessageFlag
+    error_name: str | None
+    reply_serial: int
+    sender: str | None
+    unix_fds: list[int]
+    signature: str
+    signature_tree: SignatureTree
+    body: list[Any]
+    serial: int
 
 
 class Codec(Protocol):
