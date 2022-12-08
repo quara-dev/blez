@@ -4,7 +4,7 @@ import time
 from dataclasses import dataclass
 from typing import Any, Callable
 
-from blez.interfaces.dbus import Codec, Message
+from blez.interfaces.dbus import Codec, Message, MessageType
 
 from ..dbus.tree import Tree
 
@@ -47,6 +47,8 @@ class MessageHandler:
         message: Message,
         timestamp: int | None = None,
     ) -> PropertiesChanged | InterfacesAdded | InterfacesRemoved | None:
+        if message.message_type.value != MessageType.SIGNAL.value:
+            return
         # Get timestamp
         received_timestamp = timestamp or self.clock()
         # Get message member
@@ -79,7 +81,7 @@ class MessageHandler:
     def process_message(self, message: Message) -> None:
         event = self.parse_message(message)
         if event is None:
-            return
+            return None
         if isinstance(event, PropertiesChanged):
             self.tree.update_interface(
                 path=event.path,
@@ -87,7 +89,7 @@ class MessageHandler:
                 changed_props=event.changed_props,
                 invalidated_props=event.invalidated_props,
             )
-            return
+            return None
         if isinstance(event, InterfacesAdded):
             for interface, props in event.added_interfaces.items():
                 self.tree.set_interface(
@@ -95,7 +97,8 @@ class MessageHandler:
                     interface=interface,
                     properties=props,
                 )
-                return
+                return None
         if isinstance(event, InterfacesRemoved):
             for interface in event.removed_interfaces:
                 self.tree.remove_interface(event.path, interface)
+        return None

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Callable
 from blez.interfaces.dbus import MessageType
 
 from ..dbus.errors import BluezDBusError
+from ..dbus.match import MatchRules, MatchRulesDef
 from ..dbus.tree import Tree
 from .messages import MessageHandler
 
@@ -130,3 +131,61 @@ class Manager:
             raise BluezDBusError(reply.error_name, reply.body)
         assert reply.message_type.value == MessageType.METHOD_RETURN.value
         return reply
+
+    async def add_match(self, rules: MatchRules | MatchRulesDef) -> Message:
+        """Calls org.freedesktop.DBus.AddMatch using ``rules``."""
+        if isinstance(rules, MatchRulesDef):
+            rules = MatchRules.from_def(rules)
+        return await self.bus.call(
+            self.codec.message(
+                destination="org.freedesktop.DBus",
+                interface="org.freedesktop.DBus",
+                path="/org/freedesktop/DBus",
+                member="AddMatch",
+                signature="s",
+                body=[str(rules)],
+            )
+        )
+
+    async def remove_match(self, rules: MatchRules | MatchRulesDef) -> Message:
+        """Calls org.freedesktop.DBus.RemoveMatch using ``rules``."""
+        if isinstance(rules, MatchRulesDef):
+            rules = MatchRules.from_def(rules)
+        return await self.bus.call(
+            self.codec.message(
+                destination="org.freedesktop.DBus",
+                interface="org.freedesktop.DBus",
+                path="/org/freedesktop/DBus",
+                member="RemoveMatch",
+                signature="s",
+                body=[str(rules)],
+            )
+        )
+
+    def get_match_rules(
+        self, path: str
+    ) -> tuple[MatchRulesDef, MatchRulesDef, MatchRulesDef]:
+        interface_added = MatchRulesDef(
+            interface="org.freedesktop.DBus.ObjectManager",
+            member="InterfacesAdded",
+            path_namespace=path,
+        )
+        interface_removed = MatchRulesDef(
+            interface="org.freedesktop.DBus.ObjectManager",
+            member="InterfacesRemoved",
+            path_namespace=path,
+        )
+        properties_changed = MatchRulesDef(
+            interface="org.freedesktop.DBus.Properties",
+            member="PropertiesChanged",
+            path_namespace=path,
+        )
+        return interface_added, interface_removed, properties_changed
+
+    async def watch_from_path(self, path: str) -> None:
+        for rules in self.get_match_rules(path):
+            await self.add_match(rules)
+
+    async def unwatch_from_path(self, path: str) -> None:
+        for rules in self.get_match_rules(path):
+            await self.remove_match(rules)

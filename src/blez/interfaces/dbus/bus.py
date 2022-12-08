@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum
+from typing import Callable
 
 from .encoder import Codec, Message
 
@@ -40,4 +41,12 @@ class Bus:
         raise NotImplementedError
 
     async def call(self, msg: Message) -> Message:
+        raise NotImplementedError
+
+    def add_message_handler(self, handler: Callable[[Message], Message | bool]) -> None:
+        raise NotImplementedError
+
+    def remove_message_handler(
+        self, handler: Callable[[Message], Message | bool]
+    ) -> None:
         raise NotImplementedError

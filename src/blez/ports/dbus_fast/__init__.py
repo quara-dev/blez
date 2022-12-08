@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Mapping
+from typing import Any, Callable, Mapping
 
 from dbus_fast import BusType as FastDBusBusType
 from dbus_fast import Message
@@ -95,3 +95,11 @@ class DBusFastBus(Bus, codec=DBusFastCodec):
 
     async def call(self, msg: Message) -> Message:
         return await self._bus.call(msg)
+
+    def add_message_handler(self, handler: Callable[[Message], Message | bool]) -> None:
+        return self._bus.add_message_handler(handler)
+
+    def remove_message_handler(
+        self, handler: Callable[[Message], Message | bool]
+    ) -> None:
+        return self._bus.remove_message_handler(handler)

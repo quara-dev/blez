@@ -5,21 +5,15 @@ import re
 from .entities.bluez.adapter import BluezAdapter
 from .entities.bluez.device import BluezDevice
 from .entities.bluez.manager import Manager
-from .interfaces.dbus import Bus, Codec
+from .interfaces.dbus import Bus
 
 ADDRESS_PATTERN = re.compile("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")
 
 
-def default_bus() -> type[Bus]:
+def default_bus_backend() -> type[Bus]:
     from .ports.dbus_fast import DBusFastBus
 
     return DBusFastBus
-
-
-def default_codec() -> type[Codec]:
-    from .ports.dbus_fast import DBusFastCodec
-
-    return DBusFastCodec
 
 
 def is_address(value: str) -> bool:
@@ -31,18 +25,20 @@ class BlezClient:
         self,
         bus_address: str | None = None,
         bus_backend: type[Bus] | None = None,
-        codec_backend: type[Codec] | None = None,
     ) -> None:
         self.bus_address = bus_address
-        self.bus_backend = bus_backend or default_bus()
-        self.codec_backend = codec_backend or default_codec()
+        self.bus_backend = bus_backend or default_bus_backend()
         self.bluez = Manager(self.bus_backend(self.bus_address), name="org.bluez")
 
     async def connect(self) -> None:
         await self.bluez.bus.connect()
         await self.bluez.reset_tree()
+        self.bluez.bus.add_message_handler(self.bluez.handler.process_message)
+        await self.bluez.watch_from_path("/org/bluez")
 
     async def disconnect(self) -> None:
+        await self.bluez.unwatch_from_path("/org/bluez")
+        self.bluez.bus.remove_message_handler(self.bluez.handler.process_message)
         await self.bluez.bus.disconnect()
 
     def get_adapter(self, name: str | None) -> BluezAdapter | None:

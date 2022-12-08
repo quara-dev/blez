@@ -142,7 +142,10 @@ class Tree:
 
     def remove_interface(self, object_path: str, interface: str) -> None:
         """Remove an interface from an object"""
-        self.objects.get(object_path, {}).pop(interface, None)
+        obj = self.objects.get(object_path, {})
+        obj.pop(interface, None)
+        if not obj:
+            self.objects.pop(object_path, None)
 
     def remove_property(self, object_path: str, interface: str, key: str) -> None:
         props = self.objects.get(object_path, {}).get(interface, {})
