@@ -1,4 +1,4 @@
-FROM debian:stable
+FROM python:3.9.16-slim
 
 # Install runtime dependencies
 RUN apt-get update \
