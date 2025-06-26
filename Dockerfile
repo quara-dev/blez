@@ -1,4 +1,4 @@
-FROM quara/blez-base:latest
+FROM quara/blez-base:3.10
 
 COPY scripts /opt/blez-scripts
 
