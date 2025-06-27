@@ -1,6 +1,8 @@
 name: build-blez-image
 
 on:
+  workflow_dispatch:
+
   push:
     # tags:
     #   - "*"
