@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-BLEZ_VERSION="2022-12-05"
+BLEZ_VERSION="2026-01-22"
 DEFAULT_BLUEZ_VERSION="${BLUEZ_VERSION:-5.66}"
 
 PARENT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -37,7 +37,7 @@ function install {
     BLUEZ_DIR="bluez-$BLUEZ_VERSION"
     BLUEZ_HOME="/opt/$BLUEZ_DIR"
     BLUEZ_ARTIFACT="$BLUEZ_DIR-$(platform).tar.gz"
-    URL="https://github.com/charbonnierg/blez/releases/download/$BLEZ_VERSION/$BLUEZ_ARTIFACT"
+    URL="https://github.com/quara-dev/blez/releases/download/$BLEZ_VERSION/$BLUEZ_ARTIFACT"
     # Download build artifact from URL
     curl -O -q -L "$URL"
     # Uncompress artifact
