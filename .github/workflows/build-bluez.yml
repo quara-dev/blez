@@ -40,10 +40,13 @@ jobs:
         run: |
           BLUEZ_VERSION=$(echo "${{ matrix.version }}" | cut -d'_' -f2)
           ./scripts/cp-build.sh ${{ matrix.platform }} $BLUEZ_VERSION
+      - name: Set artifact name
+        id: artifact
+        run: echo "name=dist-$(echo '${{ matrix.platform }}' | tr '/' '-')-${{ matrix.version }}" >> $GITHUB_OUTPUT
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ matrix.platform }}-${{ matrix.version }}
+          name: ${{ steps.artifact.outputs.name }}
           path: dist/*.tar.gz
   release:
     runs-on: ubuntu-latest
