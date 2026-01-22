@@ -24,6 +24,7 @@ jobs:
           - "3.10_5.64"
           - "3.10_5.65"
           - "3.10_5.66"
+          - "3.10_5.85"
     steps:
       - name: Checkout
         uses: actions/checkout@v3

@@ -3,7 +3,7 @@
 - Without docker:
 
 ```bash
-./scripts/build.sh 5.55 5.56 5.57 5.58 5.59 5.60 5.61 5.62 5.63 5.64 5.65 5.66
+./scripts/build.sh 5.55 5.56 5.57 5.58 5.59 5.60 5.61 5.62 5.63 5.64 5.65 5.66 5.85
 ```
 
 > By default, artifacts are located in `/opt/bluez` and each bluez version is installed in `/opt/bluez-$VERSION`.
@@ -12,7 +12,7 @@
 
 ```bash
 PLATFORM="linux/arm64"
-./scripts/cp-build.sh "$PLATFORM" 5.55 5.56 5.57 5.58 5.59 5.60 5.61 5.62 5.63 5.64 5.65 5.66
+./scripts/cp-build.sh "$PLATFORM" 5.55 5.56 5.57 5.58 5.59 5.60 5.61 5.62 5.63 5.64 5.65 5.66 5.85
 ```
 
 > When using docker, artifacts are located in the `dist/` directory.
