@@ -1,6 +1,8 @@
 name: build-blez-image
 
 on:
+  workflow_dispatch:
+
   push:
     # tags:
     #   - "*"
@@ -39,7 +41,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: quara/blez:${{ matrix.version }}
+          tags: quara/blez:3.10_${{ matrix.version }}
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           build-args: |
             BLUEZ_VERSION=${{ matrix.version }}
