@@ -58,19 +58,15 @@ function build {
     VERSION="$1"
     ./bootstrap
     ./configure \
-        --disable-a2dp \
-        --disable-avrcp \
-        --disable-bap \
+        --disable-audio \
         --disable-cups \
         --disable-hid \
         --disable-hog \
         --disable-manpages \
-        --disable-mcp \
         --disable-network \
         --disable-obex \
         --disable-systemd \
         --disable-network \
-        --disable-vcp \
         --enable-deprecated \
         --enable-experimental \
         --enable-testing \
