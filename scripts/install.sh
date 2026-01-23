@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-BLEZ_VERSION="2026-01-22"
+BLEZ_VERSION="2026-01-23"
 DEFAULT_BLUEZ_VERSION="${BLUEZ_VERSION:-5.66}"
 
 PARENT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
