@@ -1,5 +1,31 @@
 ## Usage
 
+### Building Docker Images
+
+All Dockerfiles support a `PYTHON_VERSION` build arg (defaults to `3.12`).
+
+```bash
+# Build base image (Python 3.12, default)
+docker build -f Dockerfile.base -t quara/blez-base:3.12 .
+
+# Build base image (Python 3.10)
+docker build -f Dockerfile.base --build-arg PYTHON_VERSION=3.10 -t quara/blez-base:3.10 .
+
+# Build build image (Python 3.12, default)
+docker build -f Dockerfile.build -t quara/blez-build:3.12 .
+
+# Build build image (Python 3.10)
+docker build -f Dockerfile.build --build-arg PYTHON_VERSION=3.10 -t quara/blez-build:3.10 .
+
+# Build final image (Python 3.12, default)
+docker build -t quara/blez:3.12 .
+
+# Build final image (Python 3.10)
+docker build --build-arg PYTHON_VERSION=3.10 -t quara/blez:3.10 .
+```
+
+### Building BlueZ
+
 - Without docker:
 
 ```bash

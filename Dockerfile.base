@@ -1,21 +1,22 @@
-FROM python:3.10-slim
+ARG PYTHON_VERSION=3.12
+FROM python:${PYTHON_VERSION}-slim
 
 # Install runtime dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        ca-certificates \
-        curl \
-        dbus \
-        libglib2.0-0 \
-        supervisor \
+    ca-certificates \
+    curl \
+    dbus \
+    libglib2.0-0 \
+    supervisor \
     && rm -rf \
-        /var/lib/apt/lists/* \
-        /var/cache/apt/archives \
+    /var/lib/apt/lists/* \
+    /var/cache/apt/archives \
     && groupadd bluetooth
 
 # Create directories
 RUN mkdir -p \
-        /etc/bluetooth \
-        /etc/dbus-1/system.d \
-        /etc/supervisor \
-        /etc/supervisor.d
+    /etc/bluetooth \
+    /etc/dbus-1/system.d \
+    /etc/supervisor \
+    /etc/supervisor.d
