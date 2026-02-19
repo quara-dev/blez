@@ -7,7 +7,7 @@ RUN apt-get update \
     ca-certificates \
     curl \
     dbus \
-    libglib2.0-0 \
+    libglib2.0-0t64 \
     supervisor \
     && rm -rf \
     /var/lib/apt/lists/* \
